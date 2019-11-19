@@ -1,0 +1,126 @@
+---
+title: "Functions"
+output: html_document
+---
+
+```{r setup}
+library(tidyverse)
+
+df <- tibble::tibble(
+a = c(rnorm(9), -99),
+b = c(-999, -99, rnorm(8)),
+c = c(0, rnorm(9)),
+d = rnorm(10)
+)
+(df$a <- (df$a - min(df$a)) / (max(df$a) - min(df$a)))
+(df$b <- (df$b - min(df$b)) / (max(df$b) - min(df$b)))
+(df$c <- (df$c - min(df$c)) / (max(df$c) - min(df$c)))
+(df$d <- (df$d - min(df$d)) / (max(df$d) - min(df$c)))
+```
+
+Write a function to automate the calculation of the rescale:
+```{r}
+#	Rescale	to	[0,	1]
+0	+	(1	-	0)	*	((df$a	-	min(df$a))	/	(max(df$a)	-	min(df$a)))
+
+#	Rescale	to	[-1,	1]
+-1	+	(1	-	-1)	*	((df$b	-	min(df$b))	/	(max(df$b)	-	min(df$b)))
+
+#	Rescale	to	[0,	10]
+0	+	(10	-	0)	*	((df$c	-	min(df$c))	/	(max(df$c)	-	min(df$c)))
+
+rescale<- function(x, min, max) {
+  rng<- range(x, na.rm=TRUE, finite=TRUE)
+  min + (max- min) *((x-rng[1])/(rng[2]-rng[1]))
+}
+
+rescale <- function(x, min, max) {
+  rng <- range(x, na.rm = TRUE, finite = TRUE)
+  min + (max - min) * ((x - rng[1]) / (rng[2] - rng[1]))
+}
+
+```
+
+
+##Your Turn 1
+
+Rerun the tibble to revert back to the original data.  Write a function to replace -99 with NA, called `fix_missing()`
+
+```{r}
+df <- tibble::tibble(
+a = c(rnorm(9), -99),
+b = c(-999, -99, rnorm(8)),
+c = c(0, rnorm(9)),
+d = rnorm(10)
+)
+
+
+#Here are the repeated calculations
+df$a[df$a==-99]<-NA
+df$b[df$b==-99]<-NA
+df$c[df$c==-99]<-NA
+df$d[df$d==-99]<-NA
+
+
+
+```
+
+
+Now let's write a function that allows us to easily adapt our rescaling to include a range (min, max) to modify the data.
+```{r}
+#Rescale to [0, 1]
+0 + (1 - 0) * ((df$a - min(df$a)) / (max(df$a) - min(df$a)))
+
+# Rescale to [-1, 1]
+-1 + (1 - -1) * ((df$b - min(df$b)) / (max(df$b) - min(df$b)))
+
+# Rescale to [0, 10]
+0 + (10 - 0) * ((df$c - min(df$c)) / (max(df$c) - min(df$c)))
+
+```
+
+
+## Your Turn 2
+Expand your function from 'Your Turn 1' to allow for any possible missing value type.
+```{r}
+df$a[df$a==-99]<-NA
+df$b[df$b==-99]<-NA
+df$c[df$c==-99]<-NA
+df$d[df$d==-99]<-NA
+
+fix_missing <- function(x, missing_val=c(-99,-999, -0)) {
+  x[x %in% missing_val ]<-NA
+  x
+}
+
+fix_missing(df$a)
+fix_missing(df$b, missing_val=-999)
+fix_missing(df$c, missing_val= 0)
+```
+
+
+
+# Take Aways
+
+To write a function, 
+
+1. Write code that solves the problem for a real object  
+2. Wrap the code in `function(){}` to save it  
+3. Add the name of the real object as the function argument 
+4. Write code in a way that is future-oriented.
+5. Be consisentent.
+
+This sequence will help prevent bugs in your code (and reduce the time you spend correcting bugs). 
+
+```{r}
+# Rescale to [0, 1]  
+rescale(df$a)
+
+# Rescale to [-1, 1]  
+rescale(df$b, min = -1, max = 1)
+
+# Rescale to [0, 10]  
+rescale(df$c, max = 10)
+
+```
+
